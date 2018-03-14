@@ -1,8 +1,5 @@
 package gameOfLife;
 
-
-import java.io.IOException;
-
 class Board{
     private Cell[][] board;
 
@@ -15,18 +12,18 @@ class Board{
 
     @Override
     public String toString(){
-        String printString = "";
+        StringBuilder printString = new StringBuilder();
         for(int i=0; i<board.length; i++){
             for(int j=0; j<board[i].length; j++){
                 if(board[i][j] == null){
                     board[i][j] = new Cell(i,j);
                     board[i][j].setState(State.DEAD);
                 }
-                printString = printString.concat(board[i][j].getStateName());
+                printString.append(board[i][j].getStateName());
             }
-            printString = printString.concat(System.lineSeparator());
+            printString.append(System.lineSeparator());
         }
-        return printString;
+        return printString.toString();
     }
 
     void nextGen() {
@@ -37,7 +34,7 @@ class Board{
                 //System.out.print(board[i][j].pair);
             }
         }
-
+        //game rules 23/3
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 switch(board[i][j].pair) {
@@ -107,13 +104,13 @@ class Cell{
 }
 
 enum State{
-    LIVE("x "),
-    DEAD("  ");
+    LIVE("x"),
+    DEAD(" ");
 
     private String representation;
 
     State(String representation){
-        this.representation = representation;
+        this.representation = representation.concat(" ");
     }
 
     public String getRepresentation(){
