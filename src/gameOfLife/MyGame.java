@@ -1,5 +1,7 @@
 package gameOfLife;
 
+import java.util.Arrays;
+
 class Board{
     private Cell[][] board;
 
@@ -10,7 +12,7 @@ class Board{
         }
     }
 
-    @Override
+    @Override//toString() have empty field initialization
     public String toString(){
         StringBuilder printString = new StringBuilder();
         for(int i=0; i<board.length; i++){
@@ -27,13 +29,15 @@ class Board{
     }
 
     void nextGen() {
-        //toString() have empty field initialization
-        for (int i = 0; i < board.length; i++) {
+
+        Arrays.stream(board).flatMap(innerBoard -> Arrays.stream(innerBoard))
+                .forEach(boardCell -> boardCell.getPair(board));
+       /* for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 board[i][j].getPair(board);
                 //System.out.print(board[i][j].pair);
             }
-        }
+        }*/
         //game rules 23/3
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {

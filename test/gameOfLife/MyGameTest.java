@@ -17,9 +17,9 @@ class MyGameTest {
     }
 
 
-    @DisplayName("Dead Cell")
+    @DisplayName("should Cell Die")
     @Test
-    void deadCell(){
+    void DeadCell(){
         System.out.println(line3);
         line3.nextGen();
 
