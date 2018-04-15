@@ -5,10 +5,10 @@ import java.util.Arrays;
 class Board{
     private Cell[][] board;
 
-    Board(int size, Cell ... cell){
+    Board(int size, Cell ... injectedLivedCells){
         this.board = new Cell[size][size];
-        for(Cell cell1 : cell){
-            board[cell1.getRow()][cell1.getColumn()] = cell1;
+        for(Cell cell : injectedLivedCells){
+            board[cell.getRow()][cell.getColumn()] = cell;
         }
     }
 
@@ -28,41 +28,41 @@ class Board{
         return printString.toString();
     }
 
-    void nextGen() {
+    public void nextGen() {
 
-        Arrays.stream(board).flatMap(innerBoard -> Arrays.stream(innerBoard))
+        Arrays.stream(board).flatMap(board1 -> Arrays.stream(board1))
                 .forEach(boardCell -> boardCell.getPair(board));
-       /* for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                board[i][j].getPair(board);
-                //System.out.print(board[i][j].pair);
-            }
-        }*/
-        //game rules 23/3
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                switch(board[i][j].pair) {
-                    case 0: board[i][j].setState(State.DEAD);
-                    break;
-                    case 1: board[i][j].setState(State.DEAD);
-                    break;
-                    case 2: //board[i][j].setState(State.LIVE);
-                    break;
-                    case 3: board[i][j].setState(State.LIVE);
-                    break;
-                    case 4: board[i][j].setState(State.DEAD);
-                    break;
 
+        //game rules 23/3
+       Arrays.stream(board).flatMap(board1 -> Arrays.stream(board1)).forEach(boardCell -> {
+           boardCell.changeState();
+       });
+    }
+
+    public void changesOnBoard(){
+        StringBuilder sb = new StringBuilder();
+
+        for(int i=0; i<board.length; i++){
+            for(int j=0; j<board[i].length; j++){
+                if(board[i][j] == null){
+                    board[i][j] = new Cell(i,j);
+                    board[i][j].setState(State.DEAD);
                 }
+                sb.append(board[i][j].stateChanges);
+                sb.append("  ");
             }
+            sb.append(System.lineSeparator());
         }
+
+        System.out.println(sb);
     }
 }
 
 class Cell{
     private State state;
     private int row, column;
-     int pair = 0;
+    int pair = 0;
+    int stateChanges = 0;
 
     Cell(int row, int column){
         this.state = State.LIVE;
@@ -88,6 +88,33 @@ class Cell{
 
     public int getColumn() {
         return column;
+    }
+
+    public void changeState(){
+        switch(this.pair){
+            case 0:
+                if(!this.state.equals(State.DEAD)) addStateChange();
+                this.state=State.DEAD;
+                break;
+            case 1:
+                if(!this.state.equals(State.DEAD)) addStateChange();
+                this.state=State.DEAD;
+                break;
+            case 2: // stay LIVE
+                break;
+            case 3:
+                if(!this.state.equals(State.LIVE)) addStateChange();
+                this.state=State.LIVE;
+                break;
+            case 4:
+                if(!this.state.equals(State.DEAD)) addStateChange();
+                this.state=State.DEAD;
+                break;
+        }
+    }
+
+    private void addStateChange(){
+        stateChanges++;
     }
 
     public void getPair(Cell[][] cells){
@@ -124,16 +151,21 @@ enum State{
 
 public class MyGame {
     public static void main(String[] args) throws Exception {
-        Board board = new Board(30,Cell.live(2,0),Cell.live(2,1),Cell.live(2,2),Cell.live(1,2),Cell.live(0,1));
+
+        final int DELAY_TIME = 10;
+        final int MOVE_TIME = 40;
+        final int BOARD_SIZE = 10;
+
+        Board board = new Board(BOARD_SIZE,Cell.live(2,0),Cell.live(2,1),Cell.live(2,2),Cell.live(1,2),Cell.live(0,1));
 
 
-
-
-        for(int i=0; i<100; i++){
+        for(int i=0; i<MOVE_TIME; i++){ //print and clear
             System.out.print(board);
             board.nextGen();
-            Thread.sleep(1000);
+            Thread.sleep(DELAY_TIME);
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         }
+
+        board.changesOnBoard();
     }
 }
